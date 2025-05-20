@@ -1,12 +1,8 @@
 import { test as base, Page } from "@playwright/test";
 import { Utils } from "./utils";
-import { LambdaHomePage } from "../pom/lambdaHomePage";
-import { LoginPage } from "../pom/loginPage";
-import { AccountPage } from "../pom/accountPage";
-// import { LambdaHomePage } from "../pom/lambdaHomePage";
-// import { Utils } from "./utils";
-// import { LoginPage } from "../pom/loginPage";
-// import { AccountPage } from "../pom/accountPage";
+import { LoginPage } from "../modules/login/loginPage";
+import { LambdaHomePage } from "../modules/home/lambdaHomePage";
+import { AccountPage } from "../modules/account/accountPage";
 
 const test = base.extend<{
   runner: Utils;

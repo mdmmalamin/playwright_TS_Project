@@ -17,7 +17,7 @@ export class ExpectedTextProvider {
   }
 
   private loadLambdaData(): LambdaData {
-    const jsonFilePath = path.resolve(__dirname, "../testData/lambda.json");
+    const jsonFilePath = path.resolve(__dirname, "../modules/home/lambda.json");
 
     try {
       const data = fs.readFileSync(jsonFilePath, "utf-8");

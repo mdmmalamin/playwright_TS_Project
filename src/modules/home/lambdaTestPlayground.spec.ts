@@ -1,6 +1,6 @@
-import { test } from "../utilities/fixtures";
-import lambdaData from "../testData/lambda.json";
-import { ExpectedTextProvider } from "../utilities/valueProvider";
+import { test } from "../../utilities/fixtures";
+import lambdaData from "./lambda.json";
+import { ExpectedTextProvider } from "../../utilities/valueProvider";
 
 class MenuValidationTests extends ExpectedTextProvider {
   constructor() {
@@ -8,7 +8,7 @@ class MenuValidationTests extends ExpectedTextProvider {
   }
 
   runTests() {
-    test.describe.skip("Validating Menu Click", () => {
+    test.describe("Validating Menu Click", () => {
       test.beforeEach(async ({ runner }) => {
         await runner.navigateTo(lambdaData.lambdaTestUrl);
       });

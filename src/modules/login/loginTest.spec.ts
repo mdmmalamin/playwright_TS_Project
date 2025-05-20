@@ -1,6 +1,6 @@
-import { test } from "../utilities/fixtures";
-import lambdaData from "../testData/lambda.json";
-import { ExpectedTextProvider } from "../utilities/valueProvider";
+import { test } from "../../utilities/fixtures";
+import lambdaData from "../home/lambda.json";
+import { ExpectedTextProvider } from "../../utilities/valueProvider";
 
 class LoginTest extends ExpectedTextProvider {
   constructor() {
@@ -15,7 +15,7 @@ class LoginTest extends ExpectedTextProvider {
         await runner.verifyTitle(lambdaData.pageTitle);
       });
 
-      test.skip("Validating the input fields", async ({
+      test("Validating the input fields", async ({
         runner,
         loginPage,
         lambdaPage,
