@@ -1,13 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import { ENV } from "./src/config";
 
 export default defineConfig({
   testDir: "./src",
-  testMatch: "**/*.spec.{js,ts,jsx,tsx,mjs,cts}",
+  testMatch: "**/*.spec.ts",
 
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 2,
+  retries: ENV.CONFIG.RETRIES ? 2 : 0,
+  workers: ENV.CONFIG.WORKERS ? 5 : 2,
 
   reporter: [["allure-playwright", { outputFolder: "reports/allure-report" }]],
 

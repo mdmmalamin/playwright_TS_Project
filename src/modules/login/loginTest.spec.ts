@@ -1,5 +1,5 @@
 import { test } from "../../utilities/fixtures";
-import lambdaData from "../home/lambda.json";
+import homePageData from "../home/home.data.json";
 import { ExpectedTextProvider } from "../../utilities/valueProvider";
 
 class LoginTest extends ExpectedTextProvider {
@@ -9,59 +9,77 @@ class LoginTest extends ExpectedTextProvider {
 
   runTests() {
     test.describe("Validating User Login Scenarios", () => {
-      test.beforeEach(async ({ runner }) => {
-        await runner.navigateTo(lambdaData.lambdaTestUrl);
-        await runner.verifyContainsUrl(lambdaData.lambdaTestUrl);
-        await runner.verifyTitle(lambdaData.pageTitle);
+      test.beforeEach(async ({ runnerAction, runnerStatement }) => {
+        await runnerAction.navigateTo(homePageData.lambdaTestUrl);
+        await runnerStatement.verifyContainsUrl(homePageData.lambdaTestUrl);
+        await runnerStatement.verifyTitle(homePageData.pageTitle);
       });
 
       test("Validating the input fields", async ({
-        runner,
-        loginPage,
-        lambdaPage,
+        runnerAction,
+        runnerStatement,
+        useLoginPage,
+        useHomePage,
       }) => {
-        await runner.mouseHover(lambdaPage.accountButton);
-        await runner.clickOnElement(lambdaPage.loginButton);
-        await runner.verifyContainsUrl(lambdaData.loginPageUrl);
-        await runner.verifyElementIsVisible(loginPage.emailInputField);
-        await runner.clearInputField(loginPage.emailInputField);
-        await runner.typeInputBox(
-          loginPage.emailInputField,
-          "testUser@gmail.com",
+        await runnerAction.mouseHover(useHomePage.accountButton);
+        await runnerAction.clickOnElement(useHomePage.loginButton);
+        await runnerStatement.verifyContainsUrl(homePageData.loginPageUrl);
+        await runnerStatement.verifyElementIsVisible(
+          useLoginPage.emailInputField
         );
-        await runner.verifyElementIsVisible(loginPage.passwordInputField);
-        await runner.clearInputField(loginPage.passwordInputField);
-        await runner.typeInputBox(loginPage.passwordInputField, "12345678");
-        await runner.clickOnElement(loginPage.loginButton);
+        await runnerAction.clearInputField(useLoginPage.emailInputField);
+        await runnerAction.typeInputBox(
+          useLoginPage.emailInputField,
+          "testUser@gmail.com"
+        );
+        await runnerStatement.verifyElementIsVisible(
+          useLoginPage.passwordInputField
+        );
+        await runnerAction.clearInputField(useLoginPage.passwordInputField);
+        await runnerAction.typeInputBox(
+          useLoginPage.passwordInputField,
+          "12345678"
+        );
+        await runnerAction.clickOnElement(useLoginPage.loginButton);
       });
 
       test("Validating Login Attempts With Valid Credentials", async ({
-        runner,
-        loginPage,
-        lambdaPage,
-        accountPage,
+        runnerAction,
+        runnerStatement,
+        useLoginPage,
+        useHomePage,
+        useAccountPage,
       }) => {
-        await runner.mouseHover(lambdaPage.accountButton);
-        await runner.clickOnElement(lambdaPage.loginButton);
-        await runner.verifyContainsUrl(lambdaData.loginPageUrl);
-        await runner.verifyElementIsVisible(loginPage.emailInputField);
-        await runner.clearInputField(loginPage.emailInputField);
-        await runner.typeInputBox(
-          loginPage.emailInputField,
-          "mahbubasr091@gmail.com",
+        await runnerAction.mouseHover(useHomePage.accountButton);
+        await runnerAction.clickOnElement(useHomePage.loginButton);
+        await runnerStatement.verifyContainsUrl(homePageData.loginPageUrl);
+        await runnerStatement.verifyElementIsVisible(
+          useLoginPage.emailInputField
         );
-        await runner.verifyElementIsVisible(loginPage.passwordInputField);
-        await runner.clearInputField(loginPage.passwordInputField);
-        await runner.typeInputBox(loginPage.passwordInputField, "1234567889");
-        await runner.clickOnElement(loginPage.loginButton);
-        await runner.verifyElementIsVisible(accountPage.loginPageText);
-        await runner.verifyContainText(
-          accountPage.loginPageText,
-          "This is a dummy website for Web Automation Testing",
+        await runnerAction.clearInputField(useLoginPage.emailInputField);
+        await runnerAction.typeInputBox(
+          useLoginPage.emailInputField,
+          "mahbubasr091@gmail.com"
         );
-        await runner.verifyContainsUrl(lambdaData.accountPageUrl);
-        await runner.mouseHover(lambdaPage.accountButton);
-        await runner.clickOnElement(lambdaPage.accountButton);
+        await runnerStatement.verifyElementIsVisible(
+          useLoginPage.passwordInputField
+        );
+        await runnerAction.clearInputField(useLoginPage.passwordInputField);
+        await runnerAction.typeInputBox(
+          useLoginPage.passwordInputField,
+          "1234567889"
+        );
+        await runnerAction.clickOnElement(useLoginPage.loginButton);
+        await runnerStatement.verifyElementIsVisible(
+          useAccountPage.useLoginPageText
+        );
+        await runnerStatement.verifyContainText(
+          useAccountPage.useLoginPageText,
+          "This is a dummy website for Web Automation Testing"
+        );
+        await runnerStatement.verifyContainsUrl(homePageData.accountPageUrl);
+        await runnerAction.mouseHover(useHomePage.accountButton);
+        await runnerAction.clickOnElement(useHomePage.accountButton);
       });
     }); //exit
   }

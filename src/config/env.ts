@@ -1,0 +1,49 @@
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({ path: path.join(process.cwd(), ".env") });
+
+export const ENV = {
+  CONFIG: {
+    NODE_ENV: process.env.NODE_ENV,
+    RETRIES: process.env.RETRIES,
+    RETRY_LIMIT: process.env.RETRY_LIMIT,
+    RETRY_DELAY: process.env.RETRY_DELAY,
+    WORKERS: process.env.WORKERS,
+  },
+  USER: {
+    EMAIL: process.env.USER_EMAIL,
+    PASSWORD: process.env.USER_PASSWORD,
+    FIRST_NAME: process.env.USER_FIRST_NAME,
+    LAST_NAME: process.env.USER_LAST_NAME,
+    PHONE: process.env.USER_PHONE,
+  },
+  PUBLIC_URL: {
+    TEST_ENV: process.env.TEST_ENV_URL,
+    HOME_PAGE: process.env.PUBLIC_HOME_PAGE_URL,
+    LOGIN_PAGE: process.env.PUBLIC_LOGIN_PAGE_URL,
+    REGISTER_PAGE: process.env.PUBLIC_REGISTER_PAGE_URL,
+    FORGOTTEN_PASSWORD_PAGE: process.env.PUBLIC_FORGOTTEN_PASSWORD_PAGE_URL,
+    SPECIAL_PAGE: process.env.PUBLIC_SPECIAL_PAGE_URL,
+    BLOG_PAGE: process.env.PUBLIC_BLOG_PAGE_URL,
+    MEGA_MENU_APPLE_PAGE: process.env.PUBLIC_MEGA_MENU_APPLE_PAGE_URL,
+    MEGA_MENU_HEADPHONE_PAGE: process.env.PUBLIC_MEGA_MENU_HEADPHONE_PAGE_URL,
+    MEGA_MENU_DESKTOP_PAGE: process.env.PUBLIC_MEGA_MENU_DESKTOP_PAGE_URL,
+  },
+  USER_ACCOUNT_URL: {
+    ACCOUNT_PAGE: process.env.USER_ACCOUNT_PAGE_URL,
+    EDIT_PAGE: process.env.USER_ACCOUNT_EDIT_PAGE_URL,
+    PASSWORD_PAGE: process.env.USER_ACCOUNT_PASSWORD_PAGE_URL,
+    ADDRESS_BOOK_PAGE: process.env.USER_ACCOUNT_ADDRESS_BOOK_PAGE_URL,
+    WISHLIST_PAGE: process.env.USER_ACCOUNT_WISHLIST_PAGE_URL,
+    NOTIFICATION_PAGE: process.env.USER_ACCOUNT_NOTIFICATION_PAGE_URL,
+    ORDER_HISTORY_PAGE: process.env.USER_ACCOUNT_ORDER_HISTORY_PAGE_URL,
+    DOWNLOAD_PAGE: process.env.USER_ACCOUNT_DOWNLOAD_PAGE_URL,
+    RECURRING_Page: process.env.USER_ACCOUNT_RECURRING_URL,
+    REWARD_Page: process.env.USER_ACCOUNT_REWARD_URL,
+    RETURN_Page: process.env.USER_ACCOUNT_RETURN_URL,
+    TRANSACTION_Page: process.env.USER_ACCOUNT_TRANSACTION_URL,
+    NEWSLETTER_Page: process.env.USER_ACCOUNT_NEWSLETTER_URL,
+    LOGOUT_Page: process.env.USER_ACCOUNT_LOGOUT_URL,
+  },
+};
