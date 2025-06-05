@@ -1,6 +1,6 @@
 import { Page, test } from "@playwright/test";
 import logger from "../helpers/logger";
-import { AllureReporter } from "../helpers/allureReporter";
+import { AllureReporter } from "../helpers/AllureReporter";
 
 type AsyncFunction<T extends any[], R> = (...args: T) => Promise<R>;
 
@@ -67,7 +67,7 @@ export class BaseUtils {
         await AllureReporter.endStep("passed");
         return result;
       } catch (error: any) {
-        console.log(error)
+        // console.log(error)
         const errorMessage = `❌ Action "${actionName}" failed: ${error.message}`;
         this.logMessage(errorMessage, "error");
 
