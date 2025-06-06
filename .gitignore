@@ -140,3 +140,4 @@ dist
 # Allure
 allure-results
 reports
+test-logs
