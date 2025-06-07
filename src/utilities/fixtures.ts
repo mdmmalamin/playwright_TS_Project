@@ -1,9 +1,9 @@
 import { test as base, Page } from "@playwright/test";
-import { LoginPage } from "../modules/login/loginPage";
-import { HomePage } from "../modules/home/Home.pom";
-import { AccountPage } from "../modules/account/accountPage";
 import { ActionsUtils } from "./Actions.utils";
 import { StatementUtils } from "./Statement.utils";
+import { HomePage } from "../modules/home/Home.page";
+import { LoginPage } from "../modules/login/Login.page";
+import { AccountPage } from "../modules/account/Account.page";
 
 const test = base.extend<{
   runnerAction: ActionsUtils;

@@ -72,12 +72,30 @@ const logger = createLogger({
       level: "debug",
       format: format.combine(
         format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.printf(({ timestamp, level, message, stack }) => {
-          if (stack) {
-            return `[${timestamp}] ${level.toUpperCase()}: ${message}\n${stack}`;
+        // format.printf(({ timestamp, level, message, stack }) => {
+        //   if (stack) {
+        //     return `[${timestamp}] ${level.toUpperCase()}: ${message}\n${stack}`;
+        //   }
+        //   return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+        // }),
+        format.printf((info) => {
+          const { timestamp, level, message, stack } = info;
+
+          let baseMessage = `[${timestamp}] ${level.toUpperCase()}: `;
+
+          if (level === "error" && typeof message === "object") {
+            baseMessage += `\n${JSON.stringify(message, null, 2)}`;
+          } else {
+            baseMessage += message;
           }
-          return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+
+          if (stack) {
+            baseMessage += `\n${stack}`;
+          }
+
+          return baseMessage;
         }),
+
         format.colorize()
       ),
     }),

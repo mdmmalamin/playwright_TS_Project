@@ -1,11 +1,8 @@
 import { test } from "../../utilities/fixtures";
 import homePageData from "../home/home.data.json";
-import { ExpectedTextProvider } from "../../utilities/valueProvider";
 
-class LoginTest extends ExpectedTextProvider {
-  constructor() {
-    super();
-  }
+class LoginPageTest {
+  constructor() {}
 
   runTests() {
     test.describe("Validating User Login Scenarios", () => {
@@ -81,8 +78,9 @@ class LoginTest extends ExpectedTextProvider {
         await runnerAction.mouseHover(useHomePage.accountButton);
         await runnerAction.clickOnElement(useHomePage.accountButton);
       });
-    }); //exit
-  }
-}
-const testSuite = new LoginTest();
+    }); // end of describe block
+  } // end of runTests
+} // end of LoginPageTest class
+
+const testSuite = new LoginPageTest();
 testSuite.runTests();

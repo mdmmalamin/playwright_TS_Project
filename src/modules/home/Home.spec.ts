@@ -2,7 +2,7 @@ import { test } from "../../utilities/fixtures";
 import homePageData from "./home.data.json";
 import { ExpectedTextProvider } from "../../utilities/valueProvider";
 
-class MenuValidationTests extends ExpectedTextProvider {
+class HomePageTest extends ExpectedTextProvider {
   constructor() {
     super();
   }
@@ -56,10 +56,10 @@ class MenuValidationTests extends ExpectedTextProvider {
           this.expectedTexts
         );
       });
-    });
-  }
-}
+    }); // end of describe block
+  } // end of runTests
+} // end of HomePageTest class
 
 // Run the tests
-const testSuite = new MenuValidationTests();
+const testSuite = new HomePageTest();
 testSuite.runTests();
