@@ -1,53 +1,23 @@
-// import { createLogger, format, transports } from "winston";
-// import fs from "fs";
-// import { test } from "allure-playwright";
-
-// const LOG_FILE_PATH = "test-logs.log";
-
-// // Delete existing log file on each run
-// if (fs.existsSync(LOG_FILE_PATH)) {
-//   fs.unlinkSync(LOG_FILE_PATH);
-// }
-
-// // Create base Winston logger
-// const logger = createLogger({
-//   level: "info",
-//   format: format.combine(
-//     format.colorize(),
-//     format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-//     format.printf(({ timestamp, level, message }) => {
-//       return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-//     })
-//   ),
-//   transports: [
-//     new transports.Console(),
-//     new transports.File({ filename: LOG_FILE_PATH }),
-//   ],
-// });
-
-// export default logger;
-
 import { createLogger, format, transports, config } from "winston";
 import "winston-daily-rotate-file";
 import fs from "fs";
 import path from "path";
+import { ENV } from "../config/env";
 
 // Define the directory where log files will be stored
 const LOG_FILE_PATH = "test-logs";
 
-// Ensure the log directory exists
-if (!fs.existsSync(LOG_FILE_PATH)) {
-  fs.mkdirSync(LOG_FILE_PATH, { recursive: true });
-}
-
-fs.readdir(LOG_FILE_PATH, (err, files) => {
-  if (err) throw err;
-  for (const file of files) {
-    fs.unlink(path.join(LOG_FILE_PATH, file), (err) => {
-      if (err) throw err;
+if (ENV.CONFIG.NODE_ENV !== "production") {
+  // Ensure the log directory exists, or create it if it doesn't
+  if (!fs.existsSync(LOG_FILE_PATH)) {
+    fs.mkdirSync(LOG_FILE_PATH, { recursive: true });
+  } else {
+    // Clear existing log files
+    fs.readdirSync(LOG_FILE_PATH).forEach((file) => {
+      fs.unlinkSync(path.join(LOG_FILE_PATH, file));
     });
   }
-});
+}
 
 // Configure Winston Daily Rotate File transport
 const dailyRotateFileTransport = new transports.DailyRotateFile({
@@ -65,26 +35,26 @@ const dailyRotateFileTransport = new transports.DailyRotateFile({
 });
 
 // Create base Winston logger
-const logger = createLogger({
+export const logger = createLogger({
   levels: config.npm.levels,
+  level: ENV.CONFIG.NODE_ENV !== "production" ? "debug" : "info",
   transports: [
     new transports.Console({
       level: "debug",
       format: format.combine(
         format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        // format.printf(({ timestamp, level, message, stack }) => {
-        //   if (stack) {
-        //     return `[${timestamp}] ${level.toUpperCase()}: ${message}\n${stack}`;
-        //   }
-        //   return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-        // }),
         format.printf((info) => {
           const { timestamp, level, message, stack } = info;
 
           let baseMessage = `[${timestamp}] ${level.toUpperCase()}: `;
 
-          if (level === "error" && typeof message === "object") {
+          if (
+            level === "error" &&
+            typeof message === "object" &&
+            message !== null
+          ) {
             baseMessage += `\n${JSON.stringify(message, null, 2)}`;
+            baseMessage += message;
           } else {
             baseMessage += message;
           }
@@ -124,5 +94,3 @@ const logger = createLogger({
     }),
   ],
 });
-
-export default logger;

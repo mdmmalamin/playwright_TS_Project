@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { BaseUtils } from "./Base.utils";
+import { TestError } from "../errors/TestError";
 
 export class ActionsUtils extends BaseUtils {
   constructor(page: Page) {
@@ -190,8 +191,8 @@ export class ActionsUtils extends BaseUtils {
         if (actualText && actualText.trim() === expectedText) {
           await this.page.locator(identifier).click();
         } else {
-          throw new Error(
-            `Text mismatch on ${identifier}. Expected: "${expectedText}", Found: "${actualText}"`
+          throw new TestError(
+            `❌ Text mismatch on ${identifier}. Expected: "${expectedText}", Found: "${actualText}"`,
           );
         }
       }

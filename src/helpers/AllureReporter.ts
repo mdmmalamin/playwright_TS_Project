@@ -28,7 +28,7 @@ export class AllureReporter {
    * @param content The text content to attach.
    */
   static async attachText(name: string, content: string) {
-    await allure.attachment(name, content, 'text/plain');
+    await allure.attachment(name, content, 'application/json');
   }
 
   /**

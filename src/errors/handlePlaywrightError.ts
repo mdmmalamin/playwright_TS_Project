@@ -1,7 +1,7 @@
 export type ErrorDetails = {
   type: string;
   message: string;
-  path: string;
+  functionPath: string;
   testStepPath: string;
 };
 
@@ -16,9 +16,9 @@ export function handlePlaywrightError(error: any): ErrorDetails {
     .split("\n")[0];
 
   const pathMatch = rawStack.match(/\((\/[^)]+):(\d+):(\d+)\)/);
-  const path = pathMatch
+  const functionPath = pathMatch
     ? `${pathMatch[1]}:${pathMatch[2]}:${pathMatch[3]}`
-    : "Path not found";
+    : "Function path not found";
 
   const specMatches = [
     ...rawStack.matchAll(/(?:\(|\s)(\/.*?\.spec\.ts):(\d+):(\d+)(?:\)|\s|$)/g),
@@ -31,7 +31,7 @@ export function handlePlaywrightError(error: any): ErrorDetails {
   return {
     type: error.name || "UnknownError",
     message,
-    path,
+    functionPath,
     testStepPath,
   };
 }

@@ -1,12 +1,14 @@
 import { Page, test } from "@playwright/test";
-import logger from "../helpers/logger";
+import { logger } from "../helpers/logger";
 import { AllureReporter } from "../helpers/AllureReporter";
-import {
-  ErrorDetails,
-  handlePlaywrightError,
-} from "../errors/handlePlaywrightError";
 
-type AsyncFunction<T extends any[], R> = (...args: T) => Promise<R>;
+type TCatchAsync<T extends any[], R> = (...args: T) => Promise<R>;
+export type ErrorDetails = {
+  type: string;
+  message: string;
+  functionPath: string;
+  testStepPath: string;
+};
 
 export class BaseUtils {
   protected page: Page;
@@ -14,45 +16,6 @@ export class BaseUtils {
   constructor(page: Page) {
     this.page = page;
   }
-
-  private async captureScreenshotOnFailure(actionName: string): Promise<void> {
-    try {
-      const screenshotBuffer = await this.page.screenshot();
-      await AllureReporter.attachScreenshotBuffer(
-        screenshotBuffer,
-        `${actionName} Screenshot`
-      );
-      logger.error(
-        `${actionName} failed. Screenshot captured and attached to Allure.`
-      );
-    } catch (error: any) {
-      // console.log(error);
-      logger.error(
-        `❌ 📸 Error capturing screenshot for ${actionName}: ${error.message}`
-      );
-    }
-  }
-
-  // private logMessage(
-  //   message: string,
-  //   level: "info" | "waring" | "error" = "info",
-  //   errorDetails?: any
-  // ): void {
-  //   if (level === "info") {
-  //     logger.info(message);
-  //   }
-  //   if (level === "waring") {
-  //     logger.warn(message);
-  //   }
-  //   if (level === "error") {
-  //     AllureReporter.attachText("Error Log", message);
-  //     test.info().annotations.push({
-  //       type: "error",
-  //       description: message,
-  //     });
-  //     logger.error(message);
-  //   }
-  // }
 
   private logMessage(
     message: string,
@@ -74,20 +37,36 @@ export class BaseUtils {
       };
 
       const formattedText = JSON.stringify(logPayload, null, 2);
-      AllureReporter.attachText("Error Log", message);
-      test.info().annotations.push({
-        type: "error",
-        description: message,
-      });
 
       logger.error(formattedText); // object for error
     }
   }
 
+  private async captureScreenshotOnFailure(actionName: string): Promise<void> {
+    try {
+      const screenshotBuffer = await this.page.screenshot();
+      await AllureReporter.attachScreenshotBuffer(
+        screenshotBuffer,
+        `${actionName} Screenshot`
+      );
+      logger.error(
+        `${actionName} failed. Screenshot captured and attached to Allure.`
+      );
+    } catch (error: any) {
+      // console.log("❌ 📸 Error capturing screenshot", error);
+
+      this.logMessage(
+        `❌ 📸 Error capturing screenshot for ${actionName}`,
+        "error",
+        await this.handlePlaywrightError(error)
+      );
+    }
+  }
+
   protected catchAsync<T extends any[], R>(
     actionName: string,
-    func: AsyncFunction<T, R>
-  ): AsyncFunction<T, R> {
+    func: TCatchAsync<T, R>
+  ): TCatchAsync<T, R> {
     return async (...args: T): Promise<R> => {
       try {
         this.logMessage(`✅ Attempting action: ${actionName}`, "info");
@@ -103,35 +82,70 @@ export class BaseUtils {
 
         return result;
       } catch (error: any) {
+        // console.log(`❌ Error in action "${actionName}":`, error);
         // Ensure the error is thrown so the function never falls through without returning
         throw this.testError(actionName, error);
       }
     };
   }
 
-  protected async testError(actionName: string, error: Error): Promise<any> {
+  private async testError(actionName: string, error: Error): Promise<any> {
     // console.error("❌ catchAsync ERROR:", error);
     this.logMessage(
       `❌ Action "${actionName}" failed`,
       "error",
-      handlePlaywrightError(error)
+      await this.handlePlaywrightError(error)
     );
 
     await AllureReporter.endStep("failed");
 
     await test.step(`❌ Error Details for "${actionName}"`, async () => {
+      const allureErrorData = {
+        action: actionName,
+        name: error.name || "UnknownError",
+        message: error.message || "No error message provided",
+        pageUrl: this.page.url(),
+        stack: error.stack || "No stack trace",
+      };
       await AllureReporter.attachText(
         "❌ Error Information",
-        `
-        👉  ACTION: ${actionName}
-        ✏️  NAME: ${error.name || "UnknownError"}
-        📋  MESSAGE: ${error.message || "No error message provided"}
-        📍  PAGE URL: ${this.page.url()}
-        🗂️  STACK: ${error.stack || "No stack trace"}
-        `.trim()
+        JSON.stringify(allureErrorData, null, 2)
       );
 
       await this.captureScreenshotOnFailure(actionName);
     });
+  }
+
+  private async handlePlaywrightError(error: any): Promise<ErrorDetails> {
+    const rawMessage: string = error?.message || "Unknown error message";
+    const rawStack: string = error?.stack || "";
+
+    const message = rawMessage
+      .replace(/\x1B\[[0-9;]*m/g, "")
+      .replace(/^TimeoutError:\s*/, "")
+      .trim()
+      .split("\n")[0];
+
+    const pathMatch = rawStack.match(/\((\/[^)]+):(\d+):(\d+)\)/);
+    const functionPath = pathMatch
+      ? `${pathMatch[1]}:${pathMatch[2]}:${pathMatch[3]}`
+      : "Path not found";
+
+    const specMatches = [
+      ...rawStack.matchAll(
+        /(?:\(|\s)(\/.*?\.spec\.ts):(\d+):(\d+)(?:\)|\s|$)/g
+      ),
+    ];
+    const lastSpec = specMatches.at(-1);
+    const testStepPath = lastSpec
+      ? `${lastSpec[1]}:${lastSpec[2]}:${lastSpec[3]}`
+      : "Test step path not found";
+
+    return {
+      type: error.name || "UnknownError",
+      message,
+      functionPath,
+      testStepPath,
+    };
   }
 }
