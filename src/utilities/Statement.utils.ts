@@ -34,7 +34,7 @@ export class StatementUtils extends BaseUtils {
     const timeoutMs = timeout * 1000;
 
     if (ids.length !== texts.length) {
-      throw new Error(
+      throw new TestError(
         "❌ The number of identifiers must match the number of expected texts."
       );
     }
@@ -60,7 +60,7 @@ export class StatementUtils extends BaseUtils {
       );
 
       if (missing.length) {
-        throw new Error(
+        throw new TestError(
           `❌ The following elements were NOT visible within ${timeout} seconds: ${missing.join(
             ", "
           )}.`
@@ -133,39 +133,6 @@ export class StatementUtils extends BaseUtils {
       )();
     }
   }
-
-  // async verifyLinksText(
-  //   identifier: string,
-  //   expectedTexts: string | string[],
-  //   timeout = 10
-  // ): Promise<void> {
-  //   await this.catchAsync(
-  //     `Verify link texts for <<${identifier}>>`,
-  //     async () => {
-  //       const elements = this.page.locator(identifier);
-  //       await elements
-  //         .first()
-  //         .waitFor({ state: "visible", timeout: timeout * 1000 });
-
-  //       const count = await elements.count();
-  //       const textsArray = Array.isArray(expectedTexts)
-  //         ? expectedTexts
-  //         : Array(count).fill(expectedTexts);
-
-  //       if (textsArray.length !== count) {
-  //         throw new TestError(
-  //           `❌ Number of expected texts does not match the number of elements. Expected ${textsArray.length}, Found ${count}.`
-  //         );
-  //       }
-
-  //       for (let i = 0; i < count; i++) {
-  //         await expect.soft(elements.nth(i)).toHaveText(textsArray[i], {
-  //           timeout: timeout * 1000,
-  //         });
-  //       }
-  //     }
-  //   )();
-  // }
 
   async verifyLinksText(
     identifier: string,

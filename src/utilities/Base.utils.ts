@@ -49,12 +49,10 @@ export class BaseUtils {
         screenshotBuffer,
         `${actionName} Screenshot`
       );
-      logger.error(
-        `${actionName} failed. Screenshot captured and attached to Allure.`
+      this.logMessage(
+        `✅ 📸 ${actionName} failed. Screenshot captured and attached to Allure.`
       );
     } catch (error: any) {
-      // console.log("❌ 📸 Error capturing screenshot", error);
-
       this.logMessage(
         `❌ 📸 Error capturing screenshot for ${actionName}`,
         "error",
@@ -82,8 +80,6 @@ export class BaseUtils {
 
         return result;
       } catch (error: any) {
-        // console.log(`❌ Error in action "${actionName}":`, error);
-        // Ensure the error is thrown so the function never falls through without returning
         throw this.testError(actionName, error);
       }
     };

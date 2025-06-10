@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { TestError } from "../errors/TestError";
 
 interface LambdaData {
   expectedTexts: string[];
@@ -17,13 +18,18 @@ export class ExpectedTextProvider {
   }
 
   private loadLambdaData(): LambdaData {
-    const jsonFilePath = path.resolve(__dirname, "../modules/home/home.data.json");
+    const jsonFilePath = path.resolve(
+      __dirname,
+      "../modules/home/home.data.json"
+    );
 
     try {
       const data = fs.readFileSync(jsonFilePath, "utf-8");
       return JSON.parse(data);
     } catch (error) {
-      throw new Error(`Error reading or parsing the file: ${jsonFilePath}`);
+      throw new TestError(
+        `❌ Error reading or parsing the file: ${jsonFilePath}`
+      );
     }
   }
 }
