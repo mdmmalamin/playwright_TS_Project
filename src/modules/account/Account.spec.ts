@@ -1,15 +1,16 @@
-import { test } from "../../utilities/fixtures";
-import homePageData from "../home/home.data.json";
+import { test } from "@src/utilities/fixtures";
+import homePageData from "@src/modules/home/home.data.json";
+import { ENV } from "@src/config";
 
 class LoginPageTest {
   constructor() {}
 
   runTests() {
     test.describe("Validating User Account Page Scenarios", () => {
-      test.beforeEach(async ({ runnerAction, runnerStatement }) => {
-        await runnerAction.navigateTo(homePageData.lambdaTestUrl);
-        await runnerStatement.verifyContainsUrl(homePageData.lambdaTestUrl);
-        await runnerStatement.verifyTitle(homePageData.pageTitle);
+      test.beforeEach(async ({ runnerAction, runnerAssertion }) => {
+        await runnerAction.navigateTo(ENV.PUBLIC_URL.HOME_PAGE);
+        await runnerAssertion.verifyContainsUrl(ENV.PUBLIC_URL.HOME_PAGE);
+        await runnerAssertion.verifyTitle(homePageData.pageTitle);
       });
 
       test("first test", async () => {});

@@ -8,11 +8,11 @@ import { ENV } from "../config/env";
 const LOG_FILE_PATH = "test-logs";
 
 if (ENV.CONFIG.NODE_ENV !== "production") {
-  // Ensure the log directory exists, or create it if it doesn't
+  //! Ensure the log directory exists, or create it if it doesn't
   if (!fs.existsSync(LOG_FILE_PATH)) {
     fs.mkdirSync(LOG_FILE_PATH, { recursive: true });
   } else {
-    // Clear existing log files
+    //! Clear existing log files
     fs.readdirSync(LOG_FILE_PATH).forEach((file) => {
       fs.unlinkSync(path.join(LOG_FILE_PATH, file));
     });

@@ -1,25 +1,25 @@
 import { test as base, Page } from "@playwright/test";
 import { ActionsUtils } from "./Actions.utils";
-import { StatementUtils } from "./Statement.utils";
 import { HomePage } from "../modules/home/Home.page";
 import { LoginPage } from "../modules/login/Login.page";
 import { AccountPage } from "../modules/account/Account.page";
+import { AssertionsUtils } from "./Assertions.utils";
 
 const test = base.extend<{
   runnerAction: ActionsUtils;
-  runnerStatement: StatementUtils;
+  runnerAssertion: AssertionsUtils;
 
   useHomePage: HomePage;
   useLoginPage: LoginPage;
   useAccountPage: AccountPage;
 }>({
   runnerAction: async ({ page }: { page: Page }, use) => {
-    const runnerActionInstance = new ActionsUtils(page);
-    await use(runnerActionInstance);
+    const runnerActionsInstance = new ActionsUtils(page);
+    await use(runnerActionsInstance);
   },
-  runnerStatement: async ({ page }: { page: Page }, use) => {
-    const runnerStatementInstance = new StatementUtils(page);
-    await use(runnerStatementInstance);
+  runnerAssertion: async ({ page }: { page: Page }, use) => {
+    const runnerAssertionsInstance = new AssertionsUtils(page);
+    await use(runnerAssertionsInstance);
   },
 
   useHomePage: async ({ page }: { page: Page }, use) => {

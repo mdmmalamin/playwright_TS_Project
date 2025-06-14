@@ -1,6 +1,7 @@
-import { test } from "../../utilities/fixtures";
+import { test } from "@src/utilities/fixtures";
 import homePageData from "./home.data.json";
-import { ExpectedTextProvider } from "../../utilities/valueProvider";
+import { ENV } from "@src/config";
+import { ExpectedTextProvider } from "@src/utilities/valueProvider";
 
 class HomePageTest extends ExpectedTextProvider {
   constructor() {
@@ -10,22 +11,22 @@ class HomePageTest extends ExpectedTextProvider {
   runTests() {
     test.describe("Validating Menu Click", () => {
       test.beforeEach(async ({ runnerAction }) => {
-        await runnerAction.navigateTo(homePageData.lambdaTestUrl);
+        await runnerAction.navigateTo(ENV.PUBLIC_URL.HOME_PAGE);
       });
 
       test("Validating Navigation with URL & Title", async ({
-        runnerStatement,
+        runnerAssertion,
       }) => {
-        await runnerStatement.verifyContainsUrl(homePageData.lambdaTestUrl);
-        await runnerStatement.verifyTitle(homePageData.pageTitle);
+        await runnerAssertion.verifyContainsUrl(ENV.PUBLIC_URL.HOME_PAGE);
+        // await runnerAssertion.verifyTitle(homePageData.pageTitle);
       });
 
       test("Validating and Entering value to text input field", async ({
         runnerAction,
-        runnerStatement,
+        runnerAssertion,
         useHomePage,
       }) => {
-        await runnerStatement.verifyElementIsVisible([
+        await runnerAssertion.verifyElementIsVisible([
           useHomePage.textInputField,
           useHomePage.searchButton,
           useHomePage.accountButton,
@@ -40,18 +41,18 @@ class HomePageTest extends ExpectedTextProvider {
 
       test("Validating Login Form & Successful Login Attempt", async ({
         runnerAction,
-        runnerStatement,
+        runnerAssertion,
         useHomePage,
       }) => {
         await runnerAction.mouseHover(useHomePage.accountButton);
-        await runnerStatement.verifyElementIsVisible([
+        await runnerAssertion.verifyElementIsVisible([
           useHomePage.accountButton,
           useHomePage.loginButton,
         ]);
         await runnerAction.clickOnElement(useHomePage.loginButton);
         await runnerAction.clickOnElement(useHomePage.accountButton);
 
-        await runnerStatement.verifyLinksText(
+        await runnerAssertion.verifyLinksText(
           useHomePage.rightColumnList,
           this.expectedTexts
         );

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", // Set root directory of your project
+    "paths": {
+      "@src/*": ["src/*"],
+    },
+    "strict": true,                              // Enables all strict type-checking
+    "resolveJsonModule": true,                   // Allows importing .json files
+    "esModuleInterop": true,                     // Enables default import compatibility
+    "forceConsistentCasingInFileNames": true,    // Prevents casing mismatches
+    "skipLibCheck": true                         // Speeds up builds by skipping .d.ts checks
+  }
+}

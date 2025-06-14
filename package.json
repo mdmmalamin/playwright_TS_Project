@@ -33,6 +33,7 @@
   "dependencies": {
     "allure-js-commons": "^3.2.1",
     "dotenv": "^16.5.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^3.25.64"
   }
 }

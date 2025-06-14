@@ -6,8 +6,9 @@ type TCatchAsync<T extends any[], R> = (...args: T) => Promise<R>;
 export type ErrorDetails = {
   type: string;
   message: string;
-  functionPath: string;
-  testStepPath: string;
+  functionPath?: string;
+  testStepPath?: string;
+  stack?: string[];
 };
 
 export class BaseUtils {
@@ -17,7 +18,7 @@ export class BaseUtils {
     this.page = page;
   }
 
-  private logMessage(
+  protected logMessage(
     message: string,
     level: "info" | "waring" | "error" = "info",
     errorDetails?: ErrorDetails
@@ -85,7 +86,7 @@ export class BaseUtils {
     };
   }
 
-  private async testError(actionName: string, error: Error): Promise<any> {
+  protected async testError(actionName: string, error: Error): Promise<any> {
     // console.error("❌ catchAsync ERROR:", error);
     this.logMessage(
       `❌ Action "${actionName}" failed`,
@@ -112,36 +113,54 @@ export class BaseUtils {
     });
   }
 
-  private async handlePlaywrightError(error: any): Promise<ErrorDetails> {
-    const rawMessage: string = error?.message || "Unknown error message";
-    const rawStack: string = error?.stack || "";
+  // private async handlePlaywrightError(error: Error): Promise<ErrorDetails> {
+  //   const rawMessage: string = error?.message || "Unknown error message";
+  //   const rawStack: string = error?.stack || "";
 
+  //   const message = rawMessage
+  //     .replace(/\x1B\[[0-9;]*m/g, "")
+  //     .replace(/^TimeoutError:\s*/, "")
+  //     .trim()
+  //     .split("\n")[0];
+
+  //   const pathMatch = rawStack.match(/\((\/[^)]+):(\d+):(\d+)\)/);
+  //   const functionPath = pathMatch
+  //     ? `${pathMatch[1]}:${pathMatch[2]}:${pathMatch[3]}`
+  //     : "Path not found";
+
+  //   const specMatches = Array.from(
+  //     rawStack.matchAll(/(?:\(|\s)(\/.*?\.spec\.ts):(\d+):(\d+)(?:\)|\s|$)/g)
+  //   );
+  //   const lastSpec = specMatches.at(-1);
+  //   const testStepPath = lastSpec
+  //     ? `${lastSpec[1]}:${lastSpec[2]}:${lastSpec[3]}`
+  //     : "Test step path not found";
+
+  //   return {
+  //     type: error.name || "UnknownError",
+  //     message,
+  //     functionPath,
+  //     testStepPath,
+  //   };
+  // }
+
+  private async handlePlaywrightError(error: Error): Promise<ErrorDetails> {
+    const type = error.name || "UnknownError";
+
+    const rawMessage = error?.message || "Unknown error message";
     const message = rawMessage
-      .replace(/\x1B\[[0-9;]*m/g, "")
-      .replace(/^TimeoutError:\s*/, "")
+      .replace(/\x1B\[[0-9;]*m/g, "") // remove color codes
+      .replace(/^TimeoutError:\s*/, "") // remove prefix
       .trim()
-      .split("\n")[0];
+      .split("\n")[0]; // first line
 
-    const pathMatch = rawStack.match(/\((\/[^)]+):(\d+):(\d+)\)/);
-    const functionPath = pathMatch
-      ? `${pathMatch[1]}:${pathMatch[2]}:${pathMatch[3]}`
-      : "Path not found";
+    const rawStack = error?.stack || "";
 
-    const specMatches = [
-      ...rawStack.matchAll(
-        /(?:\(|\s)(\/.*?\.spec\.ts):(\d+):(\d+)(?:\)|\s|$)/g
-      ),
-    ];
-    const lastSpec = specMatches.at(-1);
-    const testStepPath = lastSpec
-      ? `${lastSpec[1]}:${lastSpec[2]}:${lastSpec[3]}`
-      : "Test step path not found";
+    const stackLines = rawStack
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.startsWith("at ")); // keep only stack trace lines
 
-    return {
-      type: error.name || "UnknownError",
-      message,
-      functionPath,
-      testStepPath,
-    };
+    return { type, message, stack: stackLines };
   }
 }

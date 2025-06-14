@@ -1,9 +1,9 @@
 import { expect, Page } from "@playwright/test";
 import TimeoutError from "@playwright/test";
 import { BaseUtils } from "./Base.utils";
-import { TestError } from "../errors/TestError";
+import { TestError } from "@src/errors";
 
-export class StatementUtils extends BaseUtils {
+export class AssertionsUtils extends BaseUtils {
   constructor(page: Page) {
     super(page);
   }
@@ -35,19 +35,20 @@ export class StatementUtils extends BaseUtils {
 
     if (ids.length !== texts.length) {
       throw new TestError(
-        "❌ The number of identifiers must match the number of expected texts."
+        `❌ Expected ${texts.length} identifiers but received ${ids.length}. Make sure both arrays are of equal length.`
       );
     }
 
     const description =
       ids.length === 1
-        ? `Verify element <<${ids[0]}>> contains text: "${texts[0]}"`
-        : `Verify multiple elements contain expected texts`;
+        ? `🔍 Verify element <<${ids[0]}>> contains text: "${texts[0]}"`
+        : `🔍 Verify ${ids.length} elements contain expected texts`;
 
     await this.catchAsync(description, async () => {
       const locators = ids.map((id) => this.page.locator(id));
       const missing: string[] = [];
 
+      //? Step 1: Wait for visibility
       await Promise.all(
         locators.map((locator, i) =>
           locator
@@ -61,17 +62,33 @@ export class StatementUtils extends BaseUtils {
 
       if (missing.length) {
         throw new TestError(
-          `❌ The following elements were NOT visible within ${timeout} seconds: ${missing.join(
-            ", "
-          )}.`
+          `❌ The following elements were NOT visible within ${timeout} seconds:\n${missing.join(
+            "\n"
+          )}`
         );
       }
 
+      //? Step 2: Check that each element contains the expected text
+      const failedAssertions: string[] = [];
+
       await Promise.all(
-        locators.map((locator, i) =>
-          expect.soft(locator).toContainText(texts[i])
-        )
+        locators.map(async (locator, i) => {
+          const textContent = await locator.textContent();
+          if (!textContent?.includes(texts[i])) {
+            failedAssertions.push(
+              `- Selector: <<${ids[i]}>>\n  Expected: "${texts[i]}"\n  Actual: "${textContent}"`
+            );
+          }
+          //? Still run soft assertion for test report
+          await expect.soft(locator).toContainText(texts[i]);
+        })
       );
+
+      if (failedAssertions.length) {
+        throw new TestError(
+          `❌ Text content mismatches:\n${failedAssertions.join("\n")}`
+        );
+      }
     })();
   }
 

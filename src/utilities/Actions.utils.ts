@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { BaseUtils } from "./Base.utils";
-import { TestError } from "../errors/TestError";
+import { TestError } from "@src/errors";
 
 export class ActionsUtils extends BaseUtils {
   constructor(page: Page) {
@@ -9,7 +9,14 @@ export class ActionsUtils extends BaseUtils {
 
   async navigateTo(url: string): Promise<void> {
     await this.catchAsync(`Navigate to "${url}"`, async () => {
-      await this.page.goto(url);
+      await this.page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 15000, // 15 seconds
+      });
+
+      this.logMessage(
+        `⏱️ Navigation to "${url}" took ${Date.now() - Date.now()}ms`
+      );
     })();
   }
 
@@ -192,7 +199,7 @@ export class ActionsUtils extends BaseUtils {
           await this.page.locator(identifier).click();
         } else {
           throw new TestError(
-            `❌ Text mismatch on ${identifier}. Expected: "${expectedText}", Found: "${actualText}"`,
+            `❌ Text mismatch on ${identifier}. Expected: "${expectedText}", Found: "${actualText}"`
           );
         }
       }
