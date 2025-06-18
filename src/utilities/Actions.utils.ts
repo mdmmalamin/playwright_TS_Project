@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { BaseUtils } from "./Base.utils";
-import { TestError } from "@src/errors";
+import { TErrorType, TestError } from "@src/errors";
 
 export class ActionsUtils extends BaseUtils {
   constructor(page: Page) {
@@ -179,7 +179,7 @@ export class ActionsUtils extends BaseUtils {
 
   // This method combines validation and clicking, often better suited for a specific Page Object
   // but included here as a compound action.
-  async validateAndClick(
+  async validateTextAndClickOnElement(
     identifier: string,
     expectedText: string,
     timeout: number = 10
@@ -199,6 +199,7 @@ export class ActionsUtils extends BaseUtils {
           await this.page.locator(identifier).click();
         } else {
           throw new TestError(
+            TErrorType.TextMismatch,
             `❌ Text mismatch on ${identifier}. Expected: "${expectedText}", Found: "${actualText}"`
           );
         }

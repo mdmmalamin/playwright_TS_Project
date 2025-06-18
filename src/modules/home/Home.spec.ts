@@ -38,6 +38,14 @@ class HomePageTest extends ExpectedTextProvider {
         await runnerAction.clickOnElement(useHomePage.loginButton);
         await runnerAction.clickOnElement(useHomePage.accountButton);
       });
+    }); // end of describe block
+  } // end of runTests
+
+  runFooterTests() {
+    test.describe("Validating Footer Links", () => {
+      test.beforeEach(async ({ runnerAction }) => {
+        await runnerAction.navigateTo(ENV.PUBLIC_URL.HOME_PAGE);
+      });
 
       test("Validating Login Form & Successful Login Attempt", async ({
         runnerAction,
@@ -58,9 +66,10 @@ class HomePageTest extends ExpectedTextProvider {
         );
       });
     }); // end of describe block
-  } // end of runTests
+  }
 } // end of HomePageTest class
 
 // Run the tests
 const testSuite = new HomePageTest();
 testSuite.runTests();
+testSuite.runFooterTests();

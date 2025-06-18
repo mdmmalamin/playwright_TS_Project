@@ -1,7 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import TimeoutError from "@playwright/test";
 import { BaseUtils } from "./Base.utils";
-import { TestError } from "@src/errors";
+import { TErrorType, TestError } from "@src/errors";
 
 export class AssertionsUtils extends BaseUtils {
   constructor(page: Page) {
@@ -35,6 +35,7 @@ export class AssertionsUtils extends BaseUtils {
 
     if (ids.length !== texts.length) {
       throw new TestError(
+        TErrorType.TextMismatch,
         `❌ Expected ${texts.length} identifiers but received ${ids.length}. Make sure both arrays are of equal length.`
       );
     }
@@ -62,6 +63,7 @@ export class AssertionsUtils extends BaseUtils {
 
       if (missing.length) {
         throw new TestError(
+          TErrorType.ElementNotVisible,
           `❌ The following elements were NOT visible within ${timeout} seconds:\n${missing.join(
             "\n"
           )}`
@@ -74,9 +76,11 @@ export class AssertionsUtils extends BaseUtils {
       await Promise.all(
         locators.map(async (locator, i) => {
           const textContent = await locator.textContent();
-          if (!textContent?.includes(texts[i])) {
+          const actual = textContent?.trim() || "";
+          const expected = texts[i].trim();
+          if (!actual.includes(expected)) {
             failedAssertions.push(
-              `- Selector: <<${ids[i]}>>\n  Expected: "${texts[i]}"\n  Actual: "${textContent}"`
+              `- Selector: <<${ids[i]}>>\n  Expected: "${expected}"\n  Actual: "${actual}"`
             );
           }
           //? Still run soft assertion for test report
@@ -86,6 +90,7 @@ export class AssertionsUtils extends BaseUtils {
 
       if (failedAssertions.length) {
         throw new TestError(
+          TErrorType.TextMismatch,
           `❌ Text content mismatches:\n${failedAssertions.join("\n")}`
         );
       }
@@ -137,17 +142,34 @@ export class AssertionsUtils extends BaseUtils {
       ? identifier
       : [identifier];
 
+    const failedSelectors: string[] = [];
+
     for (const singleIdentifier of identifiersToVerify) {
       await this.catchAsync(
         `Verify element <<${singleIdentifier}>> is visible`,
         async () => {
-          await this.page.waitForSelector(singleIdentifier, {
-            state: "visible",
-            timeout: timeout * 1000,
-          });
-          await expect.soft(this.page.locator(singleIdentifier)).toBeVisible();
+          try {
+            await this.page.waitForSelector(singleIdentifier, {
+              state: "visible",
+              timeout: timeout * 1000,
+            });
+            await expect
+              .soft(this.page.locator(singleIdentifier))
+              .toBeVisible();
+          } catch {
+            failedSelectors.push(singleIdentifier);
+          }
         }
       )();
+    }
+
+    if (failedSelectors.length) {
+      throw new TestError(
+        TErrorType.ElementNotVisible,
+        `The following elements were not visible:\n${failedSelectors.join(
+          "\n"
+        )}`
+      );
     }
   }
 
@@ -171,6 +193,7 @@ export class AssertionsUtils extends BaseUtils {
 
         if (textsArray.length !== count) {
           throw new TestError(
+            TErrorType.TextMismatch,
             `❌ Number of expected texts does not match the number of elements. Expected ${textsArray.length}, Found ${count}.`
           );
         }
@@ -180,6 +203,7 @@ export class AssertionsUtils extends BaseUtils {
 
           if (actualText.trim() !== textsArray[i].trim()) {
             throw new TestError(
+              TErrorType.TextMismatch,
               `❌ Text mismatch at index ${i}. Expected: "${textsArray[i]}", but Actual: "${actualText}"`
             );
           }
@@ -188,22 +212,33 @@ export class AssertionsUtils extends BaseUtils {
     )();
   }
 
-  async validateButtonAttribute(
+  async verifyAttribute(
     identifier: string,
-    hrefAttribute: string,
+    attribute: string,
+    expectedValue: string,
     timeout: number = 10
   ): Promise<void> {
     await this.catchAsync(
-      `Validate button <<${identifier}>> has href attribute: "${hrefAttribute}"`,
+      `Verify <<${identifier}>> has attribute [${attribute}="${expectedValue}"]`,
       async () => {
-        const button = this.page.locator(identifier);
         await this.page.waitForSelector(identifier, {
           state: "visible",
           timeout: timeout * 1000,
         });
-        await expect(button).toBeVisible();
-        const hrefValue = await button.getAttribute("href");
-        expect(hrefValue).toBe(hrefAttribute);
+        const attrValue = await this.page
+          .locator(identifier)
+          .getAttribute(attribute);
+        expect(attrValue).toBe(expectedValue);
+      }
+    )();
+  }
+
+  async verifyCount(identifier: string, expectedCount: number): Promise<void> {
+    await this.catchAsync(
+      `Verify <<${identifier}>> has count: ${expectedCount}`,
+      async () => {
+        const elements = this.page.locator(identifier);
+        await expect(elements).toHaveCount(expectedCount);
       }
     )();
   }

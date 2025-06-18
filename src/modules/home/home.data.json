@@ -1,26 +1,26 @@
 {
   "pageTitle": "Your Store",
   "expectedTexts": [
-    " Login",
-    " Register",
-    " Forgotten Passwor",
-    " My Account",
-    " Address Book",
-    " Wish List",
-    " Order History",
-    " Downloads",
-    " Recurring payments",
-    " Reward Points",
-    " Returns",
-    " Transactions",
-    " Newsletter"
+    "Login",
+    "Register",
+    "Forgotten Password",
+    "My Account",
+    "Address Book",
+    "Wish List",
+    "Order History",
+    "Downloads",
+    "Recurring payments",
+    "Reward Points",
+    "Returns",
+    "Transactions",
+    "Newsletter"
   ],
   "accountMenuTexts": [
-    " Dashboard",
-    " My order",
-    " Return",
-    " Tracking",
-    " My voucher",
-    " Logout"
+    "Dashboard",
+    "My order",
+    "Return",
+    "Tracking",
+    "My voucher",
+    "Logout"
   ]
 }
